@@ -11,6 +11,7 @@ import {
   LogOut,
   X,
   Save,
+  Sun,
 } from "lucide-react";
 import type { Difficulty } from "../shared/types";
 import { isTerminal } from "../shared/initial";
@@ -24,6 +25,7 @@ import { ActionBar, ProgressStrip } from "../features/exploration";
 import { analyze, InferencePanel } from "../features/inference";
 import { ToolPanel } from "../features/tools";
 import { ChroniclePanel, ResultPanel } from "../features/chronicle";
+import { OpticsView } from "../features/optics";
 import { useGame } from "./useGame";
 import { GuideDialog } from "./ui/GuideDialog";
 import { LaunchDialog } from "./ui/LaunchDialog";
@@ -34,6 +36,7 @@ export function App() {
   const [launch, setLaunch] = useState<Difficulty | null>(null);
   const [extract, setExtract] = useState(false);
   const [hints, setHints] = useState(false);
+  const [tab, setTab] = useState<"ruin" | "optics">("ruin");
   const analysis = useMemo(() => analyze(publicBoard(e.board)), [e.board]);
   const r = region(e.board.difficulty);
   const report = state.doc.archive.reports.find((v) => v.id === e.id);
@@ -52,9 +55,27 @@ export function App() {
           </span>
         </a>
         <nav aria-label="主导航">
-          <a className="nav-active" href="#map">
+          <a
+            className={tab === "ruin" ? "nav-active" : ""}
+            href="#map"
+            onClick={(ev) => {
+              ev.preventDefault();
+              setTab("ruin");
+            }}
+          >
             <Map size={14} />
             遗迹探索
+          </a>
+          <a
+            className={tab === "optics" ? "nav-active" : ""}
+            href="#optics"
+            onClick={(ev) => {
+              ev.preventDefault();
+              setTab("optics");
+            }}
+          >
+            <Sun size={14} />
+            光路封门
           </a>
           <a href="#chronicle">
             <BookOpen size={14} />
@@ -77,6 +98,12 @@ export function App() {
         </div>
       </header>
       <main>
+        {tab === "optics" ? (
+          <div id="optics">
+            <OpticsView />
+          </div>
+        ) : (
+          <>
         <div className="page-heading">
           <div>
             <span className="eyebrow">
@@ -169,6 +196,8 @@ export function App() {
             </div>
           </aside>
         </div>
+          </>
+        )}
         <footer>
           <span>
             RUINFIELD EXPLORER’S SOCIETY <i /> EST. 2026
